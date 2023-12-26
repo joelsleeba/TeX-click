@@ -50,12 +50,42 @@ function handleInlineEquationClick(event) {
   }
 }
 
-// Attach the event listener to all descendants of .ltx_equationgroup
-document.querySelectorAll(".ltx_equation *").forEach(element => {
-  element.addEventListener("click", handleBlockEquationClick);
-});
 
-// // Attach the event listener to all descendants of .ltx_Math which are not themselves descendants of .ltx_equation
-document.querySelectorAll(".ltx_Math[display='inline']:not(.ltx_equationgroup *) *").forEach(element => {
-  element.addEventListener("click", handleInlineEquationClick);
-});
+function setup() {
+
+  // Add HTML5(ar5iv) link to arXiv source list for old preprints
+  if (!document.getElementById('latexml-download-link')) {
+    try {
+      var prefix = location.pathname
+      var ul = document.querySelector('.full-text ul')
+      var li = document.createElement('li')
+      var a = document.createElement('a')
+      a.href = 'https://ar5iv.org' + prefix
+      a.innerText = 'HTML5 (ar5iv)'
+      a.className = 'abs-button'
+      a.target = '_blank'
+      li.appendChild(a)
+      ul.appendChild(li)
+      // var secondLastChild = ul.children[ul.children.length - 2]
+      // secondLastChild.parentNode.insertBefore(li, secondLastChild);
+    }catch(e) {
+      console.log('error happened, skip.\n', e)
+    }
+  }
+
+  // Attach the event listener to all descendants of .ltx_equationgroup
+  document.querySelectorAll(".ltx_equation *").forEach(element => {
+    element.addEventListener("dblclick", handleBlockEquationClick);
+  });
+
+  // Attach the event listener to all descendants of .ltx_Math which are not themselves descendants of .ltx_equation
+  document.querySelectorAll(".ltx_Math[display='inline']:not(.ltx_equationgroup *) *").forEach(element => {
+    element.addEventListener("dblclick", handleInlineEquationClick);
+  });
+}
+
+if (document.readyState === 'loading') {
+  document.addEventListener('DOMContentLoaded', setup)
+} else {
+  setup()
+}

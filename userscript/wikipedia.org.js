@@ -25,7 +25,15 @@ function handleEquationClick(event) {
   }
 }
 
-// // Attach the event listener to all descendants of .ltx_Math which are not themselves descendants of .ltx_equation
-document.querySelectorAll(".mwe-math-element *").forEach(element => {
-  element.addEventListener("click", handleEquationClick);
-});
+function setup() {
+  // Attach the event listener to all descendants of .ltx_Math which are not themselves descendants of .ltx_equation
+  document.querySelectorAll(".mwe-math-element *").forEach(element => {
+    element.addEventListener("dblclick", handleEquationClick);
+  });
+}
+
+if (document.readyState === 'loading') {
+  document.addEventListener('DOMContentLoaded', setup)
+} else {
+  setup()
+}
