@@ -1,16 +1,20 @@
 // https://greasyfork.org/en/scripts/483133-stackexchange-tex-copy
 
-function handleEquationClick(event) {
+// Need to get the innerText of span elements which follow immediately after these following classes
+// MathJax_Display
+// MathJax
+//
+function handleEquationClick(class_name, event) {
   event.stopPropagation();
-  const equation = event.target.closest(".math-container")
+  const equation = event.target.closest(class_name)
+  const mathScript = equation.nextElementSibling
 
-  if (equation) {
+  if (mathScript.getAttribute('type').includes('tex')) {
     // Wikipedia nicely packs a single <math> element inside each .mwe-math-element classes
-    const mathScript = equation.querySelector("script[type='math/tex']");
     const tex = mathScript.innerText
     console.log(tex);
 
-    // Do something with the joined alt text here, e.g., display it in an alert:
+    // Copy tex to clipboard
     navigator.clipboard.writeText(tex)
     .then(() => {
       // Copying succeeded
@@ -21,19 +25,25 @@ function handleEquationClick(event) {
       console.error("Failed to copy TeX :", err);
     });
   } else {
-    console.log("Clicked element is not within an .mwe-math-element");
+    console.log("Clicked element does not contain TeX script");
   }
 }
 
 function setup() {
-  // Attach the event listener to all descendants of .ltx_Math which are not themselves descendants of .ltx_equation
-  document.querySelectorAll(".math-container *").forEach(element => {
-    element.addEventListener("dblclick", handleEquationClick);
+  // Attach the event listener to all descendants of MathJax_Display
+  document.querySelectorAll(".MathJax_Display *").forEach(element => {
+    element.addEventListener("dblclick", handleEquationClick.bind(null, '.MathJax_Display'));
+  });
+
+  // Attach the event listener to all descendants of .MathJax which are not themselves descendants of .MathJax_Display
+  document.querySelectorAll(".MathJax:not(.MathJax_Display *) *").forEach(element => {
+    element.addEventListener("dblclick", handleEquationClick.bind(null, '.MathJax'));
   });
 }
 
-if (document.readyState === 'loading') {
-  document.addEventListener('DOMContentLoaded', setup)
-} else {
+// For some reason this condition seems to be failing
+// if (document.readyState === 'loading') {
+//   document.addEventListener('DOMContentLoaded', setup)
+// } else {
   setup()
-}
+// }

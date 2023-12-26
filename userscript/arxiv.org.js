@@ -1,55 +1,38 @@
 // https://greasyfork.org/en/scripts/483099-ar5iv-tex-copy
 
-function handleBlockEquationClick(event) {
+function handleEquationClick(value, event) {
   event.stopPropagation();
-  const equation = event.target.closest(".ltx_equation")
 
-  if (equation) {
+  var tex;
+  if (value === '.ltx_equation') {
+    const equation = event.target.closest(".ltx_equation")
     const mathElements = equation.querySelectorAll("math");
     const altTexts = Array.from(mathElements).map(element => {
       const altText = element.getAttribute("alttext");
       return altText.replace(/\\displaystyle/g, ""); // Remove '\displaystyle'
     });
-    const tex = altTexts.join(" ");
-    console.log(tex);
-
-    // Do something with the joined TeX here, e.g., display it in an alert:
-    navigator.clipboard.writeText(tex)
-    .then(() => {
-      // Copying succeeded
-      console.log("TeX copied to clipboard");
-    })
-    .catch(err => {
-      // Copying failed, handle the error
-      console.error("Failed to copy TeX:", err);
-    });
+    tex = altTexts.join(" ");
+  } else if (value === '.ltx_Math'){
+    const equation = event.target.closest("math")
+    tex = equation.getAttribute("alttext");
   } else {
-    console.log("Clicked element is not within an .ltx_equation");
+    console.log("Bug! Clicked equation not in .ltx_Math or .ltx_equation")
+    return -1
   }
+
+  console.log(tex);
+
+  // Copy tex to clipboard
+  navigator.clipboard.writeText(tex)
+  .then(() => {
+    // Copying succeeded
+    console.log("TeX copied to clipboard");
+  })
+  .catch(err => {
+    // Copying failed, handle the error
+    console.error("Failed to copy TeX:", err);
+  });
 }
-
-function handleInlineEquationClick(event) {
-  event.stopPropagation();
-  const equation = event.target.closest("math")
-
-  if (equation) {
-    const tex = equation.getAttribute("alttext");
-    console.log(tex);
-    // Do something with the joined TeX here, e.g., display it in an alert:
-    navigator.clipboard.writeText(tex)
-    .then(() => {
-      // Copying succeeded
-      console.log("TeX copied to clipboard");
-    })
-    .catch(err => {
-      // Copying failed, handle the error
-      console.error("Failed to copy TeX:", err);
-    });
-  } else {
-    console.log("Clicked element is not within an .ltx_equation");
-  }
-}
-
 
 function setup() {
 
@@ -73,14 +56,14 @@ function setup() {
     }
   }
 
-  // Attach the event listener to all descendants of .ltx_equationgroup
+  // Attach the event listener to all descendants of .ltx_equation
   document.querySelectorAll(".ltx_equation *").forEach(element => {
-    element.addEventListener("dblclick", handleBlockEquationClick);
+    element.addEventListener("dblclick", handleEquationClick.bind(null, '.ltx_equation'));
   });
 
-  // Attach the event listener to all descendants of .ltx_Math which are not themselves descendants of .ltx_equation
+  // Attach the event listener to all descendants of .ltx_Math which are not themselves descendants of .ltx_equationgroup
   document.querySelectorAll(".ltx_Math[display='inline']:not(.ltx_equationgroup *) *").forEach(element => {
-    element.addEventListener("dblclick", handleInlineEquationClick);
+    element.addEventListener("dblclick", handleEquationClick.bind(null, '.ltx_Math'));
   });
 }
 
