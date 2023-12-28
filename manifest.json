@@ -1,8 +1,9 @@
 {
   "manifest_version": 2,
   "name": "TeX Click",
-  "version": "1.0",
+  "version": "0.1alpha",
   "description": "Double click equations on popular websites to copy their corresponding TeX code.",
+  "update_url": "https://github.com/joelsleeba/TeX-click",
   "permissions": [
     "activeTab",
     "scripting"
@@ -17,7 +18,7 @@
       "js": ["userscript/wikipedia.org.js"]
     },
     {
-      "matches": ["*://*.stackexchange.com/*"],
+      "matches": ["*://*.stackexchange.com/*", "*://*.dbfin.com/*"],
       "js": ["userscript/stackexchange.com.js"]
     }
   ]
